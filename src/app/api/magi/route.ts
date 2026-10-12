@@ -6,7 +6,15 @@ export const maxDuration = 60; // Vercelなどのタイムアウト設定 (最�
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'リクエストの形式が不正です。正しいJSON形式で送信してください。' },
+        { status: 400 }
+      );
+    }
     const question = typeof body?.question === 'string' ? body.question.trim() : '';
 
     if (!question) {
