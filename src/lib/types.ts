@@ -92,4 +92,5 @@ export interface MagiResult {
     ennea: Revision;
   };
   phase5: FinalVerdict;
+  apiError?: string; // API呼び出し失敗時の詳細エラーメッセージ
 }

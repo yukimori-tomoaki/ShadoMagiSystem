@@ -298,11 +298,25 @@ ${trimmedQuestion}
     };
   } catch (err: unknown) {
     console.error('MAGI pipeline OpenAI error, falling back to mock:', err);
+    let errorDetail = 'OpenAI API呼び出しエラーが発生したため、モックデータで審議を表示しています。';
+
+    if (err && typeof err === 'object') {
+      const anyErr = err as Record<string, any>;
+      if (anyErr.status === 429 || anyErr.code === 'credit_balance_exhausted' || anyErr.type === 'insufficient_quota') {
+        errorDetail = '【OpenAIクレジット残高不足 (429)】APIキーは正常に認識されましたが、OpenAIアカウントのクレジット残高が $0 です。https://platform.openai.com/settings/organization/billing にてクレジットをチャージ（$5等）すると、実機AIが即座に動作します。';
+      } else if (anyErr.status === 401) {
+        errorDetail = '【APIキー認証エラー (401)】設定されたOPENAI_API_KEYが無効です。キーをご確認ください。';
+      } else if (anyErr.message) {
+        errorDetail = `【OpenAIエラー】${anyErr.message}`;
+      }
+    }
+
     // エラー時はユーザーが止まらないようモックにフォールバック（画面上にはモック表示される）
     return {
       ...generateMockMagiResult(trimmedQuestion),
       id: `fallback-${Date.now()}`,
       isMock: true,
+      apiError: errorDetail,
     };
   }
 }

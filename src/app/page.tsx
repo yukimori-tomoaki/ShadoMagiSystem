@@ -155,12 +155,20 @@ export default function ShadomagiPage() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {isCurrentResultMock ? (
-            <div className="magi-badge magi-badge-mock">
-              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#f59e0b' }} />
-              モック動作中 (APIキー未設定)
+          {result?.apiError ? (
+            <div
+              className="magi-badge"
+              style={{
+                background: 'rgba(239, 68, 68, 0.18)',
+                border: '1px solid rgba(239, 68, 68, 0.5)',
+                color: '#f87171',
+                boxShadow: '0 0 12px rgba(239, 68, 68, 0.25)',
+              }}
+            >
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#ef4444' }} />
+              APIエラー (モック表示)
             </div>
-          ) : (
+          ) : hasApiKey ? (
             <div
               className="magi-badge"
               style={{
@@ -173,28 +181,41 @@ export default function ShadomagiPage() {
               <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
               OpenAI API 接続中 (実機AI判定)
             </div>
+          ) : (
+            <div className="magi-badge magi-badge-mock">
+              <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#f59e0b' }} />
+              モック動作中 (APIキー未設定)
+            </div>
           )}
         </div>
       </header>
 
       <main className="shadomagi-container">
         {/* モード案内バナー */}
-        {isCurrentResultMock ? (
-          <div className="magi-banner-mock">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: 24 }}>💡</span>
-              <div>
-                <strong style={{ display: 'block', fontSize: 13, color: '#fcd34d' }}>
-                  現在は「モックモード」で起動しています
-                </strong>
-                <p style={{ margin: 0, fontSize: 12, color: '#94a3b8' }}>
-                  OpenAI APIキー未設定でもUIと判断プロセスの挙動を確認できるよう、設定書に基づいたシミュレーションデータを表示しています。
-                  実際のAI判断を行うには <code>.env.local</code> に <code>OPENAI_API_KEY</code> を設定してください。
-                </p>
-              </div>
+        {result?.apiError ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 14,
+              padding: '14px 20px',
+              background: 'linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(15, 23, 42, 0.85))',
+              border: '1px solid rgba(239, 68, 68, 0.5)',
+              borderRadius: 8,
+              marginBottom: 24,
+            }}
+          >
+            <span style={{ fontSize: 24 }}>⚠️</span>
+            <div>
+              <strong style={{ display: 'block', fontSize: 13, color: '#f87171', marginBottom: 4 }}>
+                OpenAI API接続に関するお知らせ
+              </strong>
+              <p style={{ margin: 0, fontSize: 12, color: '#fca5a5', lineHeight: 1.6 }}>
+                {result.apiError}
+              </p>
             </div>
           </div>
-        ) : (
+        ) : hasApiKey ? (
           <div
             style={{
               display: 'flex',
@@ -213,8 +234,23 @@ export default function ShadomagiPage() {
                 OpenAI API 連携モードで動作中
               </strong>
               <p style={{ margin: 0, fontSize: 12, color: '#94a3b8' }}>
-                ユーザーの入力に対して、モノ・テトラ・エンネア・ドライツェーンの各AIがリアルタイムに独立判断・相互批評・最終判定を実行しています。
+                APIキーが認識されました。ユーザーの入力に対して、モノ・テトラ・エンネア・ドライツェーンの各AIがリアルタイムに独立判断・相互批評・最終判定を実行します。
               </p>
+            </div>
+          </div>
+        ) : (
+          <div className="magi-banner-mock">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: 24 }}>💡</span>
+              <div>
+                <strong style={{ display: 'block', fontSize: 13, color: '#fcd34d' }}>
+                  現在は「モックモード」で起動しています
+                </strong>
+                <p style={{ margin: 0, fontSize: 12, color: '#94a3b8' }}>
+                  OpenAI APIキー未設定でもUIと判断プロセスの挙動を確認できるよう、設定書に基づいたシミュレーションデータを表示しています。
+                  実際のAI判断を行うには <code>.env.local</code> に <code>OPENAI_API_KEY</code> を設定してください。
+                </p>
+              </div>
             </div>
           </div>
         )}
